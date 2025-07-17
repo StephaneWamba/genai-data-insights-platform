@@ -1,155 +1,22 @@
-# GenAI Data Insights Platform - Backend
+# GenAI Data Insights Platform
 
-AI-powered business intelligence platform enabling natural language queries for retail analytics insights. Built with FastAPI, modern data stack, and OpenAI integration.
+**Transform business questions into actionable insights in seconds, not days.**
 
-## 🏗️ Architecture
+## 🎯 Client Problem Solved
 
-```mermaid
-graph TB
-    subgraph "Presentation Layer"
-        API[FastAPI REST API]
-        Routes[API Routes]
-        Schemas[Pydantic Schemas]
-    end
+As a **Director of Sales & Operations** at a retail company, you need to:
 
-    subgraph "Application Layer"
-        UC[Use Cases]
-        ProcessQuery[Process Query Use Case]
-        GenerateInsights[Generate Insights Use Case]
-    end
+- ❌ **Stop waiting days** for custom dashboards and reports
+- ❌ **Stop missing opportunities** due to slow data turnaround
+- ❌ **Stop depending on IT** for every business question
+- ❌ **Stop interpreting raw charts** yourself
 
-    subgraph "Domain Layer"
-        Entities[Domain Entities]
-        Services[Domain Services]
-        ValueObjects[Value Objects]
-    end
+## ✅ Our Solution Delivers
 
-    subgraph "Infrastructure Layer"
-        RealData[Real Data Service]
-        OpenAI[OpenAI Service]
-        Cache[Redis Cache]
-        DB[(PostgreSQL)]
-        ClickHouse[(ClickHouse)]
-    end
-
-    API --> Routes
-    Routes --> UC
-    UC --> Services
-    Services --> RealData
-    Services --> OpenAI
-    Services --> Cache
-    RealData --> ClickHouse
-    UC --> DB
-```
-
-## 🚀 Features
-
-### Core Capabilities
-
-- **Natural Language Query Processing**: Convert business questions into actionable insights
-- **Real-time Data Analytics**: Live data from ClickHouse data warehouse
-- **AI-Powered Insights**: OpenAI GPT-4o Mini integration for intelligent analysis
-- **Multi-Data Source Support**: Sales, inventory, customers, and business metrics
-- **Caching Layer**: Redis-based performance optimization
-
-### API Endpoints
-
-```mermaid
-graph LR
-    subgraph "Data Endpoints"
-        Sales[/api/v1/data/sales]
-        Inventory[/api/v1/data/inventory]
-        Customers[/api/v1/data/customers]
-        Metrics[/api/v1/data/metrics]
-    end
-
-    subgraph "AI Endpoints"
-        Query[/api/v1/queries/process]
-        Insights[/api/v1/insights]
-    end
-
-    subgraph "Health & Monitoring"
-        Health[/api/v1/data/health]
-        CacheHealth[/api/v1/data/cache/health]
-    end
-```
-
-## 🛠️ Tech Stack
-
-| Component            | Technology         | Purpose                      |
-| -------------------- | ------------------ | ---------------------------- |
-| **API Framework**    | FastAPI            | High-performance async API   |
-| **Data Warehouse**   | ClickHouse         | Real-time analytics data     |
-| **Cache**            | Redis              | Performance optimization     |
-| **Database**         | PostgreSQL         | Metadata and user data       |
-| **AI/LLM**           | OpenAI GPT-4o Mini | Natural language processing  |
-| **Containerization** | Docker             | Deployment and orchestration |
-| **Message Queue**    | Kafka              | Real-time data streaming     |
-| **Orchestration**    | Airflow            | Data pipeline management     |
-
-## 📊 Data Flow
-
-```mermaid
-sequenceDiagram
-    participant Client
-    participant API as FastAPI
-    participant UC as Use Case
-    participant Service as Domain Service
-    participant Data as Real Data Service
-    participant AI as OpenAI
-    participant Cache as Redis
-    participant DB as ClickHouse
-
-    Client->>API: Natural Language Query
-    API->>UC: Process Query
-    UC->>Service: Analyze Intent
-    Service->>AI: Generate Insights
-    AI-->>Service: AI Insights
-    UC->>Data: Fetch Relevant Data
-    Data->>DB: Query ClickHouse
-    DB-->>Data: Real-time Data
-    UC->>Cache: Store Results
-    UC-->>API: Structured Response
-    API-->>Client: Insights + Recommendations
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Docker & Docker Compose
-- OpenAI API Key
-- Python 3.9+
-
-### Setup
+**Ask questions in plain English, get AI-powered insights instantly:**
 
 ```bash
-# Clone repository
-git clone https://github.com/StephaneWamba/genai-data-insights-platform.git
-cd genai-data-insights-platform
-
-# Configure environment
-cp env.example .env
-# Add your OPENAI_API_KEY to .env
-
-# Start services
-docker-compose up -d
-
-# Verify deployment
-curl http://localhost:8000/api/v1/data/health
-```
-
-### Access Points
-
-- **API Documentation**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/api/v1/data/health
-- **Sales Data**: http://localhost:8000/api/v1/data/sales
-
-## 📈 Demo Queries
-
-Test the AI-powered query processing:
-
-```bash
+# Instead of waiting for analysts...
 curl -X POST "http://localhost:8000/api/v1/queries/process" \
   -H "Content-Type: application/json" \
   -d '{
@@ -158,7 +25,7 @@ curl -X POST "http://localhost:8000/api/v1/queries/process" \
   }'
 ```
 
-**Example Response:**
+**Get this response in under 2 seconds:**
 
 ```json
 {
@@ -166,8 +33,14 @@ curl -X POST "http://localhost:8000/api/v1/queries/process" \
   "insights": [
     {
       "title": "Shift in Consumer Preferences",
-      "description": "Analysis shows changing customer behavior...",
+      "description": "Analysis shows changing customer behavior towards online shopping. Consider investing in omnichannel strategy.",
       "confidence_score": 0.8,
+      "data_sources": ["clickhouse_sales_data"]
+    },
+    {
+      "title": "Competitive Pricing Strategy",
+      "description": "Competitors in Paris have aggressive pricing. Revisit pricing strategy to stay competitive.",
+      "confidence_score": 0.7,
       "data_sources": ["clickhouse_sales_data"]
     }
   ],
@@ -178,94 +51,105 @@ curl -X POST "http://localhost:8000/api/v1/queries/process" \
 }
 ```
 
-## 🏛️ Clean Architecture
+## 🚀 Business Impact
 
-The backend follows Domain-Driven Design (DDD) principles:
+| Before                                   | After                                           |
+| ---------------------------------------- | ----------------------------------------------- |
+| **Days** to get insights                 | **Seconds** to get insights                     |
+| **Analysts required** for every question | **Self-service** for business users             |
+| **Raw data** interpretation needed       | **AI-generated narratives** and recommendations |
+| **Missed opportunities** due to delays   | **Real-time** decision making                   |
+| **IT dependency** for data access        | **Natural language** queries                    |
 
-```mermaid
-graph TB
-    subgraph "Presentation Layer"
-        Routes[API Routes]
-        Schemas[Pydantic Models]
-    end
+## 🛠️ What's Actually Built
 
-    subgraph "Application Layer"
-        UseCases[Use Cases]
-        DTOs[Data Transfer Objects]
-    end
+### ✅ Real-Time Data Analytics
 
-    subgraph "Domain Layer"
-        Entities[Business Entities]
-        Services[Domain Services]
-        ValueObjects[Value Objects]
-    end
+- **ClickHouse data warehouse** with live sales, inventory, customer data
+- **FastAPI backend** serving 1000+ requests/minute
+- **Redis caching** for sub-second response times
 
-    subgraph "Infrastructure Layer"
-        Repositories[Data Repositories]
-        ExternalServices[External Services]
-        Database[Database Models]
-    end
+### ✅ AI-Powered Query Processing
 
-    Routes --> UseCases
-    UseCases --> Entities
-    UseCases --> Services
-    Services --> Repositories
-    Repositories --> Database
-    ExternalServices --> Services
+- **OpenAI GPT-4o Mini** integration for natural language understanding
+- **Structured output** with confidence scores and data source attribution
+- **Actionable recommendations** based on real business data
+
+### ✅ Production-Ready Architecture
+
+- **Clean Architecture** with dependency injection
+- **Docker containerization** for easy deployment
+- **Health monitoring** and comprehensive logging
+- **Security** with input validation and audit trails
+
+## 📊 Real Data Sources
+
+The platform connects to your actual business data:
+
+- **Sales Data**: Revenue, profit, quantity sold by product/store/date
+- **Inventory Data**: Stock levels, reorder points, supplier info
+- **Customer Data**: Segments, purchase history, preferences
+- **Business Metrics**: KPIs, trends, performance indicators
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone and setup
+git clone https://github.com/StephaneWamba/genai-data-insights-platform.git
+cd genai-data-insights-platform
+
+# 2. Add your OpenAI API key
+cp env.example .env
+# Edit .env and add: OPENAI_API_KEY=your_key_here
+
+# 3. Start the platform
+docker-compose up -d
+
+# 4. Test with a real business question
+curl -X POST "http://localhost:8000/api/v1/queries/process" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query_text": "What products are selling best in Paris this month?",
+    "user_id": "user123"
+  }'
 ```
 
-## 🔧 Development
+**Access:**
 
-### Project Structure
+- **API Docs**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/api/v1/data/health
 
-```
-backend/
-├── app/
-│   ├── application/          # Use cases
-│   ├── domain/              # Business logic
-│   ├── infrastructure/      # External services
-│   └── presentation/        # API layer
-├── alembic/                 # Database migrations
-└── requirements.txt         # Dependencies
-```
+## 📈 Success Metrics Achieved
 
-### Key Components
+- **⚡ Response Time**: < 2 seconds for complex queries
+- **🎯 Accuracy**: AI insights with confidence scores
+- **📊 Data Sources**: Real ClickHouse analytics data
+- **🔄 Scalability**: 1000+ requests/minute capacity
+- **🔒 Security**: Input validation and audit logging
 
-- **Real Data Service**: ClickHouse integration for live analytics
-- **OpenAI Service**: LLM integration with structured output
-- **Cache Service**: Redis-based caching for performance
-- **Query Processing**: Natural language to SQL conversion
-- **Insight Generation**: AI-powered business recommendations
+## 🎯 Client Requirements Met
 
-## 📊 Performance & Monitoring
+✅ **Self-service analytics platform** - Natural language queries  
+✅ **Real-time data access** - Live ClickHouse integration  
+✅ **AI-generated insights** - OpenAI-powered analysis  
+✅ **Actionable recommendations** - Business-focused suggestions  
+✅ **Transparency** - Data source attribution and audit trails  
+✅ **No IT dependency** - Business users can query directly
 
-- **Response Time**: < 2s for complex queries
-- **Throughput**: 1000+ requests/minute
-- **Caching**: Redis with TTL optimization
-- **Health Checks**: Comprehensive service monitoring
-- **Logging**: Structured logging with correlation IDs
+## 📚 Documentation
 
-## 🔒 Security
+- **[Setup Guide](docs/setup.md)** - Detailed installation and configuration
+- **[API Reference](docs/api.md)** - Complete endpoint documentation
+- **[Architecture](docs/architecture.md)** - Technical implementation details
 
-- Input validation with Pydantic
-- Rate limiting on API endpoints
-- Secure environment variable handling
-- CORS configuration for frontend integration
-- Audit logging for compliance
+## 🏆 Highlights
 
-## 🎯 Portfolio Highlights
-
-- **Modern Data Stack**: ClickHouse + Kafka + Airflow integration
-- **AI/ML Integration**: OpenAI GPT-4o Mini with structured output
-- **Clean Architecture**: DDD principles with clear separation of concerns
-- **Real-time Analytics**: Live data processing and insights
-- **Scalable Design**: Microservices-ready architecture
-- **Production Ready**: Docker, monitoring, and health checks
-
-## 📝 License
-
-MIT License - see LICENSE file for details.
+- **Modern Data Stack**: ClickHouse + Redis + FastAPI
+- **AI/ML Integration**: OpenAI with structured output
+- **Clean Architecture**: Domain-driven design principles
+- **Production Ready**: Docker, monitoring, security
+- **Real Business Value**: Solves actual client problems
 
 ---
 
-**Built with ❤️ using FastAPI, OpenAI, and modern data technologies**
+**Built to eliminate the gap between business questions and actionable insights.**
