@@ -66,18 +66,27 @@ class InsightResponse(BaseModel):
 
 
 class VisualizationResponse(BaseModel):
-    """Schema for visualization response"""
+    """Schema for visualization response with raw chart data"""
 
     type: str = Field(..., description="Chart type")
     title: str = Field(..., description="Visualization title")
     data_source: str = Field(..., description="Data source for visualization")
+    chart_data: Optional[Dict[str, Any]] = Field(
+        None, description="Raw data for frontend chart rendering")
+    data_points: Optional[int] = Field(
+        None, description="Number of data points in chart")
+    columns_used: Optional[List[str]] = Field(
+        None, description="Columns used in chart")
 
     class Config:
         schema_extra = {
             "example": {
-                "type": "line_chart",
-                "title": "Trend Analysis",
-                "data_source": "sales_data"
+                "type": "bar_chart",
+                "title": "Sales by Product",
+                "data_source": "sales_data",
+                "image": "iVBORw0KGgoAAAANSUhEUgAA...",
+                "data_points": 10,
+                "columns_used": ["product", "revenue"]
             }
         }
 

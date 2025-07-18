@@ -53,9 +53,9 @@ class ProcessQueryUseCase:
         # Step 6: Persist insights to database
         insights = self.insight_repository.create_many(insights)
 
-        # Step 7: Create query result
+        # Step 7: Create query result with data context for chart generation
         query_result = self.query_processing_service.create_query_result(
-            query, insights, intent)
+            query, insights, intent, data_context)
 
         # Step 8: Mark query as processed and update in database
         query.processed = True

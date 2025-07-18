@@ -30,7 +30,14 @@ class QueryIntent(BaseModel):
     )
     suggested_visualizations: List[str] = Field(
         description="List of chart types that would be useful",
-        examples=[["line_chart", "bar_chart"], ["pie_chart", "scatter_plot"]]
+        examples=[
+            ["bar_chart", "line_chart"],
+            ["pie_chart", "doughnut_chart"],
+            ["scatter_plot", "bubble_chart"],
+            ["radar_chart", "horizontal_bar_chart"],
+            ["stacked_bar_chart", "multi_line_chart"],
+            ["area_chart"]
+        ]
     )
 
 
@@ -66,4 +73,37 @@ class InsightResponse(BaseModel):
         description="List of generated business insights",
         min_items=1,
         max_items=5
+    )
+
+
+class SQLQueryResponse(BaseModel):
+    """Structured model for SQL query generation"""
+    sql_query: str = Field(
+        description="The generated ClickHouse SQL query",
+        examples=[
+            "SELECT product, SUM(revenue) as total_revenue FROM sales_data WHERE date >= today() - 7 GROUP BY product ORDER BY total_revenue DESC LIMIT 5",
+            "SELECT store, SUM(profit) as store_profit FROM sales_data WHERE date >= today() - 30 GROUP BY store ORDER BY store_profit DESC"
+        ]
+    )
+    query_type: str = Field(
+        description="Type of analysis being performed",
+        examples=["sales_analysis", "store_performance",
+                  "product_trends", "profit_analysis", "customer_analysis"]
+    )
+    tables_used: List[str] = Field(
+        description="List of tables referenced in the query",
+        examples=[["sales_data"], ["sales_data", "customer_data"]]
+    )
+    columns_used: List[str] = Field(
+        description="List of columns referenced in the query",
+        examples=[["product", "revenue", "date"],
+                  ["store", "profit", "quantity_sold"]]
+    )
+    safety_check: bool = Field(
+        description="Confirmation that this is a safe SELECT query",
+        default=True
+    )
+    explanation: str = Field(
+        description="Brief explanation of what the query does",
+        max_length=500
     )

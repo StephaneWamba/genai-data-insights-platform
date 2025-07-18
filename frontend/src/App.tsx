@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Container, Typography, Box } from '@mui/material';
+import { Box, Container } from '@mui/material';
+import Dashboard from './components/Dashboard';
+import { QueryProvider } from './contexts/QueryContext';
+import { DataProvider } from './contexts/DataContext';
 
 const theme = createTheme({
   palette: {
@@ -12,6 +15,36 @@ const theme = createTheme({
     secondary: {
       main: '#dc004e',
     },
+    background: {
+      default: '#f5f5f5',
+    },
+  },
+  typography: {
+    h4: {
+      fontWeight: 600,
+    },
+    h6: {
+      fontWeight: 500,
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          borderRadius: 12,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: 'none',
+          fontWeight: 500,
+        },
+      },
+    },
   },
 });
 
@@ -19,19 +52,15 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="lg">
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h3" component="h1" gutterBottom>
-            GenAI Data Insights Platform
-          </Typography>
-          <Typography variant="h6" component="h2" gutterBottom>
-            AI-powered business intelligence for retail analytics
-          </Typography>
-          <Typography variant="body1">
-            Welcome to the platform. Natural language query interface coming soon.
-          </Typography>
-        </Box>
-      </Container>
+      <QueryProvider>
+        <DataProvider>
+          <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+            <Container maxWidth="xl" sx={{ py: 2 }}>
+              <Dashboard />
+            </Container>
+          </Box>
+        </DataProvider>
+      </QueryProvider>
     </ThemeProvider>
   );
 }

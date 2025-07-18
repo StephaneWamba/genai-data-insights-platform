@@ -81,20 +81,20 @@ class OpenAIService:
 
             # Use Instructor for structured data extraction
             intent_analysis: QueryIntent = self.instructor_client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 response_model=QueryIntent,
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a business intelligence analyst. Analyze the query intent and provide structured response."
+                        "content": "You are a senior business intelligence analyst with expertise in data analysis and strategic insights. Analyze the query intent with high precision and provide structured response."
                     },
                     {
                         "role": "user",
                         "content": f"Analyze the following business query and determine its intent and relevant business categories: '{query_text}'"
                     }
                 ],
-                temperature=0.3,
-                max_tokens=300
+                temperature=0.2,
+                max_tokens=500
             )
 
             # Convert Pydantic model to dict for backward compatibility
@@ -131,29 +131,33 @@ class OpenAIService:
 
             # Use Instructor for structured data extraction
             insight_response: InsightResponse = self.instructor_client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 response_model=InsightResponse,
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a senior business analyst. Generate actionable, data-driven insights based on the query and data context."
+                        "content": "You are a senior business analyst with expertise in data-driven decision making. Generate highly actionable, data-driven insights based on the query and concrete data context. Always reference specific numbers, trends, and data points in your insights. Provide strategic recommendations that are backed by the actual data provided."
                     },
                     {
                         "role": "user",
                         "content": f"""
-                        Based on the following business query and data context, generate 2-3 actionable business insights.
+                        Based on the following business query and detailed data context, generate 2-3 highly actionable business insights.
                         
                         Query: "{query_text}"
                         
                         Data Context:
                         {data_summary}
                         
-                        Focus on actionable insights that would help business decision-making.
+                        IMPORTANT: 
+                        - Always reference specific numbers, percentages, and data points from the provided data
+                        - Provide concrete, actionable recommendations based on the actual data
+                        - Include specific product names, store locations, and financial figures when relevant
+                        - Focus on insights that would help business decision-making with real impact
                         """
                     }
                 ],
-                temperature=0.4,
-                max_tokens=500
+                temperature=0.1,
+                max_tokens=800
             )
 
             # Convert Pydantic models to dict for backward compatibility
@@ -169,7 +173,7 @@ class OpenAIService:
             return self._fallback_insights(query_text, data_context)
 
     def _summarize_data_context(self, data_context: Dict[str, Any]) -> str:
-        """Summarize data context for the prompt"""
+        """Summarize data context for the prompt with detailed, concrete data"""
         if not data_context:
             return "No specific data context available."
 
@@ -180,11 +184,120 @@ class OpenAIService:
             if isinstance(data, list) and len(data) > 0:
                 total_revenue = sum(item.get("revenue", 0) for item in data)
                 total_profit = sum(item.get("profit", 0) for item in data)
-                return f"Sales data: {len(data)} records, Total Revenue: ${total_revenue:.2f}, Total Profit: ${total_profit:.2f}"
+
+                # Get top products by revenue
+                product_revenue = {}
+                for item in data:
+                    product = item.get("product", "Unknown")
+                    revenue = item.get("revenue", 0)
+                    product_revenue[product] = product_revenue.get(
+                        product, 0) + revenue
+
+                top_products = sorted(
+                    product_revenue.items(), key=lambda x: x[1], reverse=True)[:5]
+
+                # Get store performance
+                store_revenue = {}
+                for item in data:
+                    store = item.get("store", "Unknown")
+                    revenue = item.get("revenue", 0)
+                    store_revenue[store] = store_revenue.get(
+                        store, 0) + revenue
+
+                top_stores = sorted(store_revenue.items(),
+                                    key=lambda x: x[1], reverse=True)[:3]
+
+                profit_margin = (total_profit/total_revenue *
+                                 100) if total_revenue > 0 else 0
+                summary = f"""
+SALES DATA ANALYSIS:
+- Total Records: {len(data)} sales transactions
+- Total Revenue: ${total_revenue:,.2f}
+- Total Profit: ${total_profit:,.2f}
+- Profit Margin: {profit_margin:.1f}%
+
+TOP 5 PRODUCTS BY REVENUE:
+{chr(10).join([f"- {product}: ${revenue:,.2f}" for product, revenue in top_products])}
+
+TOP 3 STORES BY REVENUE:
+{chr(10).join([f"- {store}: ${revenue:,.2f}" for store, revenue in top_stores])}
+
+SAMPLE TRANSACTIONS (first 5):
+{chr(10).join([f"- {item.get('date', 'N/A')}: {item.get('product', 'N/A')} at {item.get('store', 'N/A')} - Qty: {item.get('quantity_sold', 0)}, Revenue: ${item.get('revenue', 0):,.2f}, Profit: ${item.get('profit', 0):,.2f}" for item in data[:5]])}
+"""
+                return summary
 
         elif data_type == "metrics":
             metrics = data
-            return f"Business metrics: Revenue: ${metrics.get('total_revenue', 0):.2f}, Profit: ${metrics.get('total_profit', 0):.2f}, Margin: {metrics.get('profit_margin', 0):.1f}%"
+            return f"""
+BUSINESS METRICS:
+- Total Revenue: ${metrics.get('total_revenue', 0):,.2f}
+- Total Profit: ${metrics.get('total_profit', 0):,.2f}
+- Profit Margin: {metrics.get('profit_margin', 0):.1f}%
+- Total Customers: {metrics.get('total_customers', 0)}
+- Average Order Value: ${metrics.get('average_order_value', 0):,.2f}
+- Inventory Turnover: {metrics.get('inventory_turnover', 0)}
+"""
+
+        elif data_type == "inventory":
+            if isinstance(data, list) and len(data) > 0:
+                total_stock = sum(item.get("current_stock", 0)
+                                  for item in data)
+                low_stock_items = [item for item in data if item.get(
+                    "current_stock", 0) <= item.get("reorder_level", 0)]
+
+                summary = f"""
+INVENTORY DATA:
+- Total Items: {len(data)} products
+- Total Stock: {total_stock} units
+- Low Stock Items: {len(low_stock_items)} products below reorder level
+
+LOW STOCK ALERTS:
+{chr(10).join([f"- {item.get('product', 'N/A')} at {item.get('store', 'N/A')}: {item.get('current_stock', 0)} units (reorder level: {item.get('reorder_level', 0)})" for item in low_stock_items[:5]])}
+"""
+                return summary
+
+        elif data_type == "customers":
+            if isinstance(data, list) and len(data) > 0:
+                total_purchases = sum(item.get("total_purchases", 0)
+                                      for item in data)
+                avg_purchases = total_purchases / len(data) if data else 0
+
+                summary = f"""
+CUSTOMER DATA:
+- Total Customers: {len(data)} customers
+- Total Purchases: {total_purchases:,.0f}
+- Average Purchases per Customer: {avg_purchases:.1f}
+
+SAMPLE CUSTOMERS:
+{chr(10).join([f"- {item.get('name', 'N/A')} ({item.get('email', 'N/A')}): {item.get('total_purchases', 0):,.0f} purchases, Last: {item.get('last_purchase', 'N/A')}" for item in data[:5]])}
+"""
+                return summary
+
+        elif data_type == "dynamic_query":
+            if isinstance(data, list) and len(data) > 0:
+                columns = data_context.get("columns", [])
+                sql_query = data_context.get("sql_query", "N/A")
+
+                summary = f"""
+DYNAMIC DATABASE QUERY RESULTS:
+- SQL Query: {sql_query}
+- Columns: {', '.join(columns)}
+- Total Rows: {len(data)} records
+
+QUERY RESULTS (first 10 rows):
+"""
+                for i, row in enumerate(data[:10]):
+                    row_summary = []
+                    for col in columns:
+                        value = row.get(col, "N/A")
+                        if isinstance(value, (int, float)):
+                            row_summary.append(f"{col}: {value:,.2f}")
+                        else:
+                            row_summary.append(f"{col}: {value}")
+                    summary += f"\nRow {i+1}: {', '.join(row_summary)}"
+
+                return summary
 
         return f"Data type: {data_type}, Records: {len(data) if isinstance(data, list) else 'N/A'}"
 
@@ -210,7 +323,7 @@ class OpenAIService:
             "confidence": 0.6,
             "categories": ["sales", "performance"],
             "data_sources": ["sales_data"],
-            "suggested_visualizations": ["line_chart"]
+            "suggested_visualizations": ["bar_chart", "line_chart", "pie_chart", "doughnut_chart", "scatter_plot", "bubble_chart", "radar_chart", "horizontal_bar_chart", "stacked_bar_chart", "multi_line_chart", "area_chart"]
         }
 
     def _fallback_insights(self, query_text: str, data_context: Dict[str, Any]) -> List[Dict[str, Any]]:

@@ -45,4 +45,11 @@ node_modules/
 
 # Frontend build
 frontend/build/
-frontend/dist/ 
+frontend/dist/
+
+# Personal/Internal Documentation
+docs/todo.md
+docs/case-study.md
+docs/implementation.md
+docs/backend/
+temp_set_key.sh 
