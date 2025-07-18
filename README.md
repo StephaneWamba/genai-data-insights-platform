@@ -37,11 +37,9 @@ The GenAI Data Insights Platform is a cutting-edge business intelligence solutio
 
 ### Multi-Chart Dashboard
 
-![Multi-Chart Visualization Dashboard - Business Analytics](docs/assets/capture1.png)
-
-### Container Architecture & Deployment
-
 ![Production Deployment - Container Architecture](docs/assets/capture2.png)
+
+![Multi-Chart Visualization Dashboard - Business Analytics](docs/assets/capture1.png)
 
 ## ✨ Features
 

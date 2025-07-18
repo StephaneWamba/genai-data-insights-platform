@@ -367,12 +367,3 @@ print(response.json())
 sales_data = requests.get("http://localhost:8000/api/v1/data/sales")
 print(f"Records: {sales_data.json()['records']}")
 ```
-
----
-
-## Performance
-
-- **Response Time**: < 2 seconds for complex queries
-- **Throughput**: 1000+ requests/minute
-- **Caching**: Redis-based with 30-minute TTL
-- **Data Freshness**: Real-time from ClickHouse
